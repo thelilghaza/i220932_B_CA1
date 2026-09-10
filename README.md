@@ -1,7 +1,7 @@
 # MLOps Continuous Delivery (CD) for ML Application
 
 [![Continuous Integration](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/ci.yml/badge.svg)](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/ci.yml)
-[![Continuous Delivery](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/cd.yml/badge.svg)](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/cd.yml)
+[![Continuous Delivery](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/cd.yml/badge.svg?branch=v1.1.0)](https://github.com/thelilghaza/i220932_B_CA1/actions/workflows/cd.yml)
 
 This repository implements an automated, production-grade Continuous Delivery (CD) pipeline for a Machine Learning inference microservice using **Flask**, **Docker**, **GitHub Container Registry (GHCR)**, **GitHub Actions**, **Staging Environments**, **Automated Smoke Testing**, and **Manual Production Approval Gates**.
 
