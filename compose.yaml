@@ -1,0 +1,51 @@
+services:
+  # Dedicated container for course demo
+  mlops-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: "1.0.0"
+        MODEL_VERSION: "1.0"
+    image: mlops-cd-demo:1.0.0
+    container_name: mlops-api-course
+    ports:
+      - "5000:5000"
+    environment:
+      - APP_VERSION=1.0.0
+      - MODEL_VERSION=1.0
+    restart: unless-stopped
+
+  # Staging environment simulation container
+  staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: "1.0.0"
+        MODEL_VERSION: "1.0"
+    image: mlops-cd-demo:staging
+    container_name: mlops-api-staging
+    ports:
+      - "5001:5000"
+    environment:
+      - APP_VERSION=1.0.0
+      - MODEL_VERSION=1.0
+    restart: unless-stopped
+
+  # Production environment simulation container
+  production:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: "1.0.0"
+        MODEL_VERSION: "1.0"
+    image: mlops-cd-demo:production
+    container_name: mlops-api-production
+    ports:
+      - "5002:5000"
+    environment:
+      - APP_VERSION=1.0.0
+      - MODEL_VERSION=1.0
+    restart: unless-stopped
