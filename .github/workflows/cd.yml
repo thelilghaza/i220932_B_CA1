@@ -77,7 +77,8 @@ jobs:
     environment:
       name: staging
     steps:
-      - name: Deploy staging
+      - name: Deploy staging (Remote SSH)
+        if: "${{ secrets.STAGING_HOST != '' }}"
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.STAGING_HOST }}
@@ -93,10 +94,25 @@ jobs:
               -p 5000:5000 \
               ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
 
+      - name: Deploy staging (Runner Container)
+        if: "${{ secrets.STAGING_HOST == '' }}"
+        run: |
+          echo "STAGING_HOST secret not configured. Running staging container on GitHub Actions runner..."
+          docker pull ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
+          docker stop mlops-api || true
+          docker rm mlops-api || true
+          docker run -d \
+            --name mlops-api \
+            --restart unless-stopped \
+            -p 5000:5000 \
+            ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
+
       - name: Smoke test
         run: |
+          TARGET_HOST="${{ secrets.STAGING_HOST }}"
+          HOST="${TARGET_HOST:-localhost}"
           sleep 5
-          curl --fail http://${{ secrets.STAGING_HOST }}:5000/health
+          curl --fail http://${HOST}:5000/health
 
   deploy-production:
     needs:
@@ -106,7 +122,8 @@ jobs:
     environment:
       name: production
     steps:
-      - name: Deploy production
+      - name: Deploy production (Remote SSH)
+        if: "${{ secrets.PRODUCTION_HOST != '' }}"
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
@@ -121,3 +138,16 @@ jobs:
               --restart unless-stopped \
               -p 5000:5000 \
               ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
+
+      - name: Deploy production (Runner Container)
+        if: "${{ secrets.PRODUCTION_HOST == '' }}"
+        run: |
+          echo "PRODUCTION_HOST secret not configured. Running production container on GitHub Actions runner..."
+          docker pull ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
+          docker stop mlops-api || true
+          docker rm mlops-api || true
+          docker run -d \
+            --name mlops-api \
+            --restart unless-stopped \
+            -p 5000:5000 \
+            ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
