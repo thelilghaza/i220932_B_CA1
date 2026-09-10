@@ -76,9 +76,13 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
+    env:
+      STAGING_HOST: ${{ secrets.STAGING_HOST }}
+      STAGING_USER: ${{ secrets.STAGING_USER }}
+      STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
     steps:
       - name: Deploy staging (Remote SSH)
-        if: "${{ secrets.STAGING_HOST != '' }}"
+        if: env.STAGING_HOST != ''
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.STAGING_HOST }}
@@ -95,7 +99,7 @@ jobs:
               ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
 
       - name: Deploy staging (Runner Container)
-        if: "${{ secrets.STAGING_HOST == '' }}"
+        if: env.STAGING_HOST == ''
         run: |
           echo "STAGING_HOST secret not configured. Running staging container on GitHub Actions runner..."
           docker pull ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
@@ -109,8 +113,7 @@ jobs:
 
       - name: Smoke test
         run: |
-          TARGET_HOST="${{ secrets.STAGING_HOST }}"
-          HOST="${TARGET_HOST:-localhost}"
+          HOST="${STAGING_HOST:-localhost}"
           sleep 5
           curl --fail http://${HOST}:5000/health
 
@@ -121,9 +124,13 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
+    env:
+      PRODUCTION_HOST: ${{ secrets.PRODUCTION_HOST }}
+      PRODUCTION_USER: ${{ secrets.PRODUCTION_USER }}
+      PRODUCTION_SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
     steps:
       - name: Deploy production (Remote SSH)
-        if: "${{ secrets.PRODUCTION_HOST != '' }}"
+        if: env.PRODUCTION_HOST != ''
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
@@ -140,7 +147,7 @@ jobs:
               ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
 
       - name: Deploy production (Runner Container)
-        if: "${{ secrets.PRODUCTION_HOST == '' }}"
+        if: env.PRODUCTION_HOST == ''
         run: |
           echo "PRODUCTION_HOST secret not configured. Running production container on GitHub Actions runner..."
           docker pull ${{ needs.build.outputs.image }}:${{ needs.build.outputs.version }}
