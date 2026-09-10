@@ -33,7 +33,7 @@ def get_git_commit():
     return "unknown"
 
 APP_VERSION = get_app_version()
-MODEL_VERSION = os.environ.get("MODEL_VERSION", "1.0")
+MODEL_VERSION = os.environ.get("MODEL_VERSION", "1.1")
 GIT_COMMIT = get_git_commit()
 
 @app.route("/")
